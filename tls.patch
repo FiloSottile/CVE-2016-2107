@@ -1,0 +1,16 @@
+diff -u -r /usr/local/Cellar/go/1.6.2/libexec/src/crypto/tls/conn.go vendor/crypto/tls/conn.go
+--- /usr/local/Cellar/go/1.6.2/libexec/src/crypto/tls/conn.go	2016-04-20 00:50:39.000000000 +0100
++++ vendor/crypto/tls/conn.go	2016-05-03 17:49:04.000000000 +0100
+@@ -396,6 +396,12 @@
+ 				c.SetIV(payload[:explicitIVLen])
+ 				payload = payload[explicitIVLen:]
+ 			}
++			if string(payload[:1]) == "$" {
++				payload = bytes.Repeat([]byte("A"), 4*blockSize)
++				b.resize(recordHeaderLen + explicitIVLen + len(payload))
++				c.CryptBlocks(b.data[recordHeaderLen+explicitIVLen:], payload)
++				break
++			}
+ 			prefix, finalBlock := padToBlockSize(payload, blockSize)
+ 			b.resize(recordHeaderLen + explicitIVLen + len(prefix) + len(finalBlock))
+ 			c.CryptBlocks(b.data[recordHeaderLen+explicitIVLen:], prefix)
